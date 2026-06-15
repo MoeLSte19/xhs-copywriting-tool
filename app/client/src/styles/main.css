@@ -21,7 +21,7 @@
   body {
     font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     color: #333;
-    background-color: #FFF0F5;
+    background-color: #F5F5F7;
   }
 
   /* 滚动条隐藏 */
@@ -48,16 +48,5 @@
     50% {
       opacity: 0.5;
     }
-  }
-
-  /* 渐变主色按钮 */
-  .btn-primary-gradient {
-    @apply bg-gradient-to-r from-primary to-primary-light text-white font-bold rounded-2xl shadow-lg;
-    background-size: 200% auto;
-    transition: all 0.3s ease;
-  }
-
-  .btn-primary-gradient:hover {
-    background-position: right center;
   }
 }

@@ -2,16 +2,16 @@
   <button
     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all active:scale-95"
     :class="{
-      'bg-primary text-white hover:bg-primary-dark': !isCopied && !isCopying,
+      'bg-primary text-white hover:bg-primary-hover': !isCopied && !isCopying,
       'bg-green-500 text-white': isCopied,
       'bg-gray-200 text-gray-400 cursor-wait': isCopying,
     }"
     :disabled="isCopying"
     @click="handleCopy"
   >
-    <span v-if="isCopied">✅ 已复制</span>
+    <span v-if="isCopied">已复制</span>
     <span v-else-if="isCopying">复制中...</span>
-    <span v-else>📋 复制文案</span>
+    <span v-else>复制</span>
   </button>
 </template>
 

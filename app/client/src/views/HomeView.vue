@@ -1,33 +1,26 @@
 <template>
-  <div class="min-h-screen bg-accent flex flex-col">
+  <div class="min-h-screen bg-surface flex flex-col">
     <!-- 顶部标题栏 -->
-    <header class="sticky top-0 z-10 bg-white/90 backdrop-blur-sm shadow-sm">
+    <header class="sticky top-0 z-10 bg-white border-b border-gray-100">
       <div class="max-w-[768px] mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <span class="text-2xl">📝</span>
-          <h1 class="text-xl font-bold text-primary">笔记侠</h1>
-          <span class="text-xs text-gray-400 hidden sm:inline">小红书爆款文案生成器</span>
-        </div>
-        <div class="text-xs text-gray-400">
-          今日剩余 <span class="text-primary font-bold">{{ remainCount }}</span> 次
+          <h1 class="text-lg font-bold text-gray-800 tracking-tight">笔记侠</h1>
+          <span class="text-xs text-gray-400 hidden sm:inline">AI 写作助手</span>
         </div>
       </div>
     </header>
 
     <!-- 主内容区 -->
-    <main class="flex-1 max-w-[768px] w-full mx-auto px-4 py-6 space-y-6">
+    <main class="flex-1 max-w-[768px] w-full mx-auto px-4 py-6 space-y-5">
       <!-- 输入区域 -->
       <InputSection />
 
       <!-- 生成结果区域 -->
       <OutputSection v-if="store.hasResult" />
 
-      <!-- Lmscan + Stop Slop 面板 -->
-      <LmscanPanel v-if="store.hasResult" />
-
       <!-- Loading 骨架屏 -->
       <div v-if="store.isGenerating" class="space-y-4">
-        <div class="bg-white rounded-2xl p-6 shadow-sm animate-pulse">
+        <div class="bg-white/60 ring-1 ring-gray-200/60 rounded-xl p-6 animate-pulse">
           <div class="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
           <div class="space-y-2">
             <div class="h-3 bg-gray-200 rounded w-full"></div>
@@ -38,17 +31,30 @@
       </div>
 
       <!-- 空状态 -->
-      <div v-if="!store.hasResult && !store.isGenerating" class="text-center py-12">
-        <span class="text-6xl mb-4 block">✨</span>
-        <p class="text-gray-400 text-sm">输入主题，一键生成小红书爆款文案</p>
+      <div v-if="!store.hasResult && !store.isGenerating" class="text-center py-16">
+        <p class="text-xl font-semibold text-gray-700 mb-2">写好你的出发点</p>
+        <p class="text-sm text-gray-400">AI 帮你把想法变成小红书的语言</p>
       </div>
+
+      <!-- 高级工具展开入口 -->
+      <div v-if="store.hasResult" class="max-w-[768px] mx-auto">
+        <button
+          class="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          @click="showAdvanced = !showAdvanced"
+        >
+          {{ showAdvanced ? '收起高级工具' : '高级工具' }}
+        </button>
+      </div>
+
+      <!-- Lmscan + Stop Slop 面板（默认折叠） -->
+      <LmscanPanel v-if="store.hasResult && showAdvanced" />
     </main>
 
-    <!-- 底部合规提示 -->
-    <footer class="bg-white/80 border-t border-gray-100">
+    <!-- 底部提示 -->
+    <footer class="border-t border-gray-100">
       <div class="max-w-[768px] mx-auto px-4 py-3">
         <p class="text-xs text-gray-400 text-center">
-          ⚠️ 建议加入个人真实体验后再发布，AI 生成内容仅供参考
+          AI 生成内容仅供参考，建议加入个人体验后发布
         </p>
       </div>
     </footer>
@@ -56,15 +62,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref } from 'vue';
 import { useGeneratorStore } from '../stores/generator';
-import { useUsageStore } from '../stores/usage';
 import InputSection from '../components/InputSection.vue';
 import OutputSection from '../components/OutputSection.vue';
 import LmscanPanel from '../components/LmscanPanel.vue';
 
 const store = useGeneratorStore();
-const usageStore = useUsageStore();
 
-const remainCount = computed(() => usageStore.remainCount);
+/** 控制高级工具面板显隐 */
+const showAdvanced = ref(false);
 </script>

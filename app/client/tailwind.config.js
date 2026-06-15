@@ -4,11 +4,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#FF2442',
-        'primary-light': '#FF6B81',
-        'primary-dark': '#D91A37',
-        accent: '#FFF0F5',
-        'accent-dark': '#FFE0EB',
+        primary: '#007AFF',
+        'primary-hover': '#3395FF',
+        'primary-dark': '#0056CC',
+        surface: '#F5F5F7',
+        'surface-dark': '#EBEBED',
       },
       fontFamily: {
         sans: ['"PingFang SC"', '"Hiragino Sans GB"', '"Microsoft YaHei"', 'sans-serif'],

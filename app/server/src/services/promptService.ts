@@ -16,11 +16,12 @@ const templateCache = new Map<string, PromptTemplate>();
 /**
  * 加载 Prompt 模板 JSON 文件
  * @param name 模板名称（不含 .json 后缀）
+ * @param useCache 是否使用缓存（默认 true）
  * @returns PromptTemplate 对象
  */
-export function loadPromptTemplate(name: string): PromptTemplate {
+export function loadPromptTemplate(name: string, useCache: boolean = true): PromptTemplate {
   // 优先读缓存
-  if (templateCache.has(name)) {
+  if (useCache && templateCache.has(name)) {
     return templateCache.get(name)!;
   }
 
@@ -31,7 +32,12 @@ export function loadPromptTemplate(name: string): PromptTemplate {
 
   const raw = fs.readFileSync(filePath, 'utf-8');
   const template: PromptTemplate = JSON.parse(raw);
-  templateCache.set(name, template);
+
+  if (useCache) {
+    templateCache.set(name, template);
+  }
+
+  console.log(`[PromptService] 已加载模板: ${name}`);
   return template;
 }
 

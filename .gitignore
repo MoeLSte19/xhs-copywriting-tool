@@ -35,5 +35,11 @@ pnpm-debug.log*
 # Testing
 coverage/
 
+# WorkBuddy workspace data
+.workbuddy/
+
+# Test/debug scripts
+test-*.js
+
 # Misc
 *.local

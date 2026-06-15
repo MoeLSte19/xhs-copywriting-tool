@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { rateLimiter } from './middleware/rateLimit.js';
 import { generateRouter } from './routes/generate.js';
 import { lmscanRouter } from './routes/lmscan.js';
+import { validateConfig } from './config/index.js';
 
 // 加载环境变量
 dotenv.config();
@@ -36,6 +37,9 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
     message: '服务器内部错误，请稍后再试',
   });
 });
+
+// 启动时校验配置
+validateConfig();
 
 // 启动服务
 app.listen(PORT, () => {

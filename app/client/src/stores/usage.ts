@@ -4,7 +4,7 @@ import { ref, computed } from 'vue';
 import type { UsageRecord } from '../types/index';
 
 const STORAGE_KEY = 'xhs_copywriting_usage';
-const DAILY_LIMIT = 3;
+const DAILY_LIMIT = 100; // 调试模式：100次/天
 
 /** 获取今天的日期字符串 YYYY-MM-DD */
 function getTodayStr(): string {
