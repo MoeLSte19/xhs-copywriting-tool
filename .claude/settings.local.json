@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(npm run *)",
+      "Bash(npm test *)",
+      "Bash(curl -s http://localhost:3000/api/health)",
+      "Bash(netstat -ano)",
+      "Bash(curl -X POST http://localhost:3000/api/generate -H 'Content-Type: application/json' -d '{\"input\": \"夏天好用的防晒霜推荐\", \"category\": \"beauty\"}')",
+      "Bash(curl *)",
+      "WebSearch",
+      "Bash(pkill -f \"tsx watch src/index.ts\")",
+      "Bash(pkill -f \"tsx src/index.ts\")"
+    ]
+  }
+}

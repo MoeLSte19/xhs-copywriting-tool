@@ -1,0 +1,63 @@
+/* 全局样式 + Tailwind 指令 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 基础重置 */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: #333;
+    background-color: #FFF0F5;
+  }
+
+  /* 滚动条隐藏 */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* 自定义组件样式 */
+@layer components {
+  /* 骨架屏脉冲动画 */
+  .skeleton-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* 渐变主色按钮 */
+  .btn-primary-gradient {
+    @apply bg-gradient-to-r from-primary to-primary-light text-white font-bold rounded-2xl shadow-lg;
+    background-size: 200% auto;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary-gradient:hover {
+    background-position: right center;
+  }
+}

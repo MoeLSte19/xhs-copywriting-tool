@@ -1,0 +1,96 @@
+sequenceDiagram
+    actor User as 用户
+    participant View as HomeView
+    participant Input as InputSection
+    participant CatSel as CategorySelector
+    participant Store as GeneratorStore
+    participant UStore as UsageStore
+    participant API as ApiService
+    participant Server as Express Server
+    participant Prompt as PromptService
+    participant AI as AiService
+    participant DS as DeepSeek API
+
+    %% ========== 1. 输入 + 生成 ==========
+    User->>Input: 输入产品/想法描述
+    User->>CatSel: 选择分类场景
+    CatSel->>Store: setCategory(category)
+
+    User->>View: 点击「生成爆款文案」
+    View->>UStore: checkUsage()
+    alt 次数已用完
+        UStore-->>View: 返回 false
+        View-->>User: 提示「今日免费次数已用完」
+    else 次数未用完
+        UStore-->>View: 返回 true
+        View->>Store: setGenerating(true)
+        View->>API: generateNote({input, category})
+        API->>Server: POST /api/generate
+
+        Server->>Prompt: getPrompt('generate', {input, category})
+        Prompt-->>Server: ChatMessage[]
+
+        Server->>AI: generateNote(input, category)
+        AI->>DS: POST /chat/completions (生成Prompt)
+        DS-->>AI: 生成文案 raw
+        AI->>AI: _parseGenerateResult(raw)
+
+        Server->>Prompt: getPrompt('detect', {content})
+        Prompt-->>Server: ChatMessage[]
+
+        Server->>AI: detectAiNess(content)
+        AI->>DS: POST /chat/completions (检测Prompt)
+        DS-->>AI: 检测结果 raw
+        AI->>AI: _parseDetectResult(raw)
+
+        AI-->>Server: {titles, content, aiScore}
+        Server-->>API: {code:200, data: GenerateResponse}
+        API-->>View: GenerateResponse
+
+        View->>Store: setGenerationResult(response)
+        View->>UStore: incrementUsage()
+        View->>Store: setGenerating(false)
+        Store-->>View: 渲染结果
+        View-->>User: 展示文案 + 5个标题 + AI味分数
+    end
+
+    %% ========== 2. 选择标题 ==========
+    User->>View: 选择标题（5选1）
+    View->>Store: selectTitle(index)
+    Store-->>View: 更新展示内容
+
+    %% ========== 3. 降AI味 ==========
+    User->>View: 点击「一键降AI味」
+    View->>API: deAiRewrite({content, aiScore})
+    API->>Server: POST /api/deai
+
+    Server->>Prompt: getPrompt('deai', {content, aiScore})
+    Prompt-->>Server: ChatMessage[]
+
+    Server->>AI: deAiRewrite(content, aiScore)
+    AI->>DS: POST /chat/completions (降AI味Prompt)
+    DS-->>AI: 改写文案 raw
+    AI->>AI: 解析结果
+
+    Server->>Prompt: getPrompt('detect', {content})
+    Prompt-->>Server: ChatMessage[]
+
+    Server->>AI: detectAiNess(newContent)
+    AI->>DS: POST /chat/completions (检测Prompt)
+    DS-->>AI: 新分数
+
+    AI-->>Server: {content, aiScore}
+    Server-->>API: {code:200, data: DeAiResponse}
+    API-->>View: DeAiResponse
+
+    View->>Store: setContent(content), setAiScore(aiScore)
+    Store-->>View: 更新展示
+    View-->>User: 展示改写后文案 + 新AI味分数
+
+    %% ========== 4. 一键复制 ==========
+    User->>View: 点击「一键复制」
+    View->>View: useCopy(content)
+    View-->>User: 复制成功提示
+
+    %% ========== 5. 合规提示 ==========
+    View-->>User: 底部提示「建议加入个人真实体验后再发布」

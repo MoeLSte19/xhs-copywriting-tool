@@ -1,0 +1,139 @@
+classDiagram
+    direction LR
+
+    %% ===== 前端类型 =====
+    class CategoryTemplate {
+        +string id
+        +string name
+        +string icon
+        +string description
+        +string promptSuffix
+    }
+
+    class GenerateRequest {
+        +string input
+        +string category
+    }
+
+    class GenerateResponse {
+        +string[] titles
+        +string content
+        +number aiScore
+        +string category
+    }
+
+    class DeAiRequest {
+        +string content
+        +number aiScore
+    }
+
+    class DeAiResponse {
+        +string content
+        +number aiScore
+    }
+
+    class ApiResponse~T~ {
+        +number code
+        +T data
+        +string message
+    }
+
+    class UsageRecord {
+        +string date
+        +number count
+        +increment() void
+        +isLimitReached() boolean
+    }
+
+    %% ===== 前端 Store =====
+    class GeneratorStore {
+        +string input
+        +string category
+        +string[] titles
+        +number selectedTitleIndex
+        +string content
+        +number aiScore
+        +boolean isGenerating
+        +boolean isDeAiing
+        +setInput(input: string) void
+        +setCategory(category: string) void
+        +setGenerationResult(response: GenerateResponse) void
+        +selectTitle(index: number) void
+        +setContent(content: string) void
+        +setAiScore(score: number) void
+        +reset() void
+    }
+
+    class UsageStore {
+        +UsageRecord record
+        +number dailyLimit
+        +checkUsage() boolean
+        +incrementUsage() void
+        +getRemainingCount() number
+        +_loadRecord() UsageRecord
+        +_saveRecord(record: UsageRecord) void
+    }
+
+    %% ===== 前端 Service =====
+    class ApiService {
+        -string baseURL
+        +generateNote(req: GenerateRequest) Promise~ApiResponse~GenerateResponse~~
+        +deAiRewrite(req: DeAiRequest) Promise~ApiResponse~DeAiResponse~~
+    }
+
+    %% ===== 后端 Service =====
+    class AiService {
+        -string apiKey
+        -string baseURL
+        -string model
+        +generateNote(input: string, category: string) Promise~GenerateResult~
+        +detectAiNess(content: string) Promise~AiDetectResult~
+        +deAiRewrite(content: string, aiScore: number) Promise~DeAiResult~
+        -_callDeepSeek(messages: ChatMessage[], temperature: number) Promise~string~
+        -_parseGenerateResult(raw: string) GenerateResult
+        -_parseDetectResult(raw: string) AiDetectResult
+    }
+
+    class PromptService {
+        -Map~string, PromptTemplate~ _templates
+        +loadAll() void
+        +getPrompt(type: string, variables: Record~string, string~) ChatMessage[]
+        -_replaceVariables(template: string, vars: Record~string, string~) string
+    }
+
+    class PromptTemplate {
+        +string system
+        +string userTemplate
+        +number temperature
+        +number maxTokens
+    }
+
+    %% ===== 后端 Controller =====
+    class GenerateController {
+        -AiService aiService
+        +handleGenerate(req: Request, res: Response) Promise~void~
+        +handleDeAi(req: Request, res: Response) Promise~void~
+    }
+
+    %% ===== 后端 Middleware =====
+    class RateLimitMiddleware {
+        +createLimiter() RateLimitRequestHandler
+    }
+
+    class ValidateMiddleware {
+        +validateGenerate(req: Request, res: Response, next: NextFunction) void
+        +validateDeAi(req: Request, res: Response, next: NextFunction) void
+    }
+
+    %% ===== 关系 =====
+    ApiService --> GenerateRequest : 发送
+    ApiService --> ApiResponse~GenerateResponse~ : 接收
+    ApiService --> DeAiRequest : 发送
+    ApiService --> ApiResponse~DeAiResponse~ : 接收
+    GeneratorStore --> GenerateResponse : 存储
+    GeneratorStore --> CategoryTemplate : 引用
+    UsageStore --> UsageRecord : 管理
+    GenerateController --> AiService : 调用
+    GenerateController --> PromptService : 调用
+    AiService --> PromptService : 获取Prompt
+    PromptService --> PromptTemplate : 加载
