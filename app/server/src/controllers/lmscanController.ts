@@ -105,25 +105,8 @@ export async function handleFullDeAiProcess(req: Request, res: Response): Promis
     // 第一步：使用 lmscanDetect 检测
     const detectResult = await lmscanDetect(content.trim());
 
-    // 如果 AI 味已经很低，不需要改写
-    if (detectResult.aiScore >= 85) {
-      res.json({
-        code: 200,
-        data: {
-          original: detectResult,
-          rewritten: {
-            content: content.trim(),
-            changes: ['文本已足够自然，无需改写'],
-            newAiScore: detectResult.aiScore,
-          },
-          finalScore: detectResult.aiScore,
-        },
-        message: '',
-      });
-      return;
-    }
-
-    // 第二步：使用 stopSlopRewrite 改写
+    // 第二步：总是执行改写（用户调用此接口就是要改写的）
+    // 注：即使分数较高，改写后的内容也会更自然
     const rewriteResult = await stopSlopRewrite(content.trim(), detectResult.aiScore);
 
     // 第三步：使用 detectAiScore 重新检测改写后的内容
